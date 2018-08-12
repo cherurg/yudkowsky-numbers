@@ -1,5 +1,6 @@
 ;(function(window, document) {
-  let currentDocument = document.currentScript.ownerDocument
+  let currentDocument = (document.currentScript || document._currentScript)
+    .ownerDocument
 
   let template = currentDocument.querySelector('template').content
 
@@ -44,11 +45,20 @@
         '.history-container',
       )
       this.statusContainer = this.shadowRoot.querySelector('.status')
+
+      this.shadowRoot
+        .querySelector('.form')
+        .addEventListener('submit', event => event.preventDefault())
     }
 
     checkNumbers() {
+      this.statusContainer.innerHTML = ''
       let numbersOk = this.verifyNumbers()
       if (!numbersOk) {
+        let error = currentDocument.createElement('span')
+        error.className = 'error'
+        error.innerHTML = 'Please, enter numbers.'
+        this.statusContainer.appendChild(error)
         return
       }
 
@@ -89,5 +99,7 @@
     }
   }
 
-  window.customElements.define('yudkowsky-numbers', YudkowskyNumbers)
+  window.addEventListener('WebComponentsReady', function(e) {
+    window.customElements.define('yudkowsky-numbers', YudkowskyNumbers)
+  })
 })(window, document)
